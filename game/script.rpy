@@ -105,8 +105,8 @@ label start:
 
  label morningDateChoice:
 
- scene outsidemorning
- pause 3.0
+  scene outsidemorning
+  pause 3.0
 
 
   menu:
@@ -326,8 +326,10 @@ label start:
 
  label erhu:
  
-  #PENDING cg of basara looking at erhu
-  scene pending
+  scene instrumens
+  
+  show erhulook
+  with dissolve
   
   jump instrument
 
@@ -336,8 +338,6 @@ label start:
   m "What did you find?"
   b "This."
   
- #PENDING sprite of basara holding erhu very interested happy flourishing in his lane relaxed 
- 
   b "Huh... two strings... and a bow. So I guess it's played like that huh... Hm."
   b "Is there somewhere I can.......... Oh, over there!"
 
