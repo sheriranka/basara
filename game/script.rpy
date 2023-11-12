@@ -120,7 +120,7 @@ label start:
   scene cafewindow
   with dissolve
  
- #PENDING bgm is "bitches blue" from galaxy network chart 1-
+  play music "audio/bitchesblue.mp3"
 
   c "What can I get for you?"
   menu: 
@@ -258,11 +258,11 @@ label start:
   
   m "I hope he doesn't get distracted and run off...."
   
+  
   scene outsidemorning
   with dissolve
   
- #NO MUSIC
- #BIRD SFX
+  stop music fadeout 1.0
  
   show standnormal
   with dissolve
@@ -287,7 +287,7 @@ label start:
   m "(Basara is so excited....!)"
   
   scene instrumens
- #PENDING bgm: "galaxy" from galaxy network chart 1. muffle it, like it's coming from overhead off the stores radio)
+  play music "audio/galaxymuffle.mp3"
  
   show standsideeye
   with dissolve
@@ -341,8 +341,8 @@ label start:
   b "Huh... two strings... and a bow. So I guess it's played like that huh... Hm."
   b "Is there somewhere I can.......... Oh, over there!"
 
-  scene pending
- #PENDING CG of basara sitting down with the instrument. bgm fades out and becomes silent-
+  scene erhuplay
+  stop music fadeout 1.0
 
   b "..."
   b "..."
@@ -350,8 +350,9 @@ label start:
   m "(Wow, he's so absorbed in it...)"
   b "I think... something like this?"
   
- #PENDING sound byte of instrument from here (https://www.youtube.com/watch?v=EoMxBTUMT-k Grab a sound bite from here?)
- 
+  play sound "audio/erhu.mp3"
+ # source https://www.youtube.com/watch?v=thqUc1bf8IU
+  pause 30.0
   m "Wow... that's--"
   b "Fire."
   
@@ -376,24 +377,21 @@ label start:
   hide standsmirk
   with dissolve
   
- #PENDING door rattle ding-a-ling sfx?
+  play sound "audio/bell.mp3"
  
   m "Wow! He left, just like that!"
   m "Hey, wait for me Basara!"
   
- #PENDING door rattle ding-a-ling sfx?
+  play sound "audio/bell.mp3"
  
   i "Ohh... not again...."
   
   scene sunset
- # actuallly add bugs sfx ^^^^
+  play sound "audio/crickets.mp3" fadeout 1.0
  
   m "Hey, Basara!"
   
- #PENDING cut to cg. Basara giving a light little wave-
-  scene pending
-
-  show standsideeye
+  show wave with dissolve
  
   b "I want to get thing home and show Ray. Sorry, you should go do whatever you want."
 
@@ -401,6 +399,7 @@ label start:
   b "Ahh... You wanted to do anything else?"
   m "No, I didnt have anything else planned but--"
 
+  hide wave
   show standsmile
 
   b "Okay."
