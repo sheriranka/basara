@@ -59,6 +59,7 @@ style vscrollbar:
     xsize gui.scrollbar_size
     base_bar Frame("gui/scrollbar/vertical_[prefix_]bar.png", gui.vscrollbar_borders, tile=gui.scrollbar_tile)
     thumb Frame("gui/scrollbar/vertical_[prefix_]thumb.png", gui.vscrollbar_borders, tile=gui.scrollbar_tile)
+    unscrollable "hide"
 
 style slider:
     ysize gui.slider_size
@@ -99,6 +100,10 @@ screen say(who, what):
     style_prefix "say"
 
     window:
+
+        background Transform(style.window.background, alpha=persistent.say_window_alpha)
+        ### IMPORTANT: The Transform() is holding the window background, and the alpha variable ties to our say window alpha
+
         id "window"
 
         if who is not None:
@@ -110,6 +115,7 @@ screen say(who, what):
 
         text what id "what"
 
+    use quick_menu
 
     ## If there's a side image, display it above the text. Do not display on the
     ## phone variant - there's no room.
@@ -120,6 +126,8 @@ screen say(who, what):
 ## Make the namebox available for styling through the Character object.
 init python:
     config.character_id_prefixes.append('namebox')
+
+default persistent.say_window_alpha = 0.75
 
 style window is default
 style say_label is default
@@ -160,6 +168,8 @@ style say_dialogue:
     xsize gui.dialogue_width
     ypos gui.dialogue_ypos
 
+    adjust_spacing False
+    line_spacing gui.preference("dialogue_spacing", 2)
 
 ## Input screen ################################################################
 ##
@@ -212,18 +222,13 @@ screen choice(items):
             textbutton i.caption action i.action
 
 
-## When this is true, menu captions will be spoken by the narrator. When false,
-## menu captions will be displayed as empty buttons.
-define config.narrator_menu = True
-
-
 style choice_vbox is vbox
 style choice_button is button
 style choice_button_text is button_text
 
 style choice_vbox:
     xalign 0.5
-    ypos 270
+    ypos 405
     yanchor 0.5
 
     spacing gui.choice_spacing
@@ -265,8 +270,11 @@ screen quick_menu():
 
 ## This code ensures that the quick_menu screen is displayed in-game, whenever
 ## the player has not explicitly hidden the interface.
-init python:
-    config.overlay_screens.append("quick_menu")
+# init python:
+#     config.overlay_screens.append("quick_menu")
+
+## We'll set this to False by default so we can show and hide the quick_menu during
+## choices and such
 
 default quick_menu = True
 
@@ -305,7 +313,8 @@ screen navigation():
 
         else:
 
-            textbutton _("History") action ShowMenu("history")
+            ## We're using the Separated History Screen, so we'll comment this out
+            # textbutton _("History") action ShowMenu("history")
 
             textbutton _("Save") action ShowMenu("save")
 
@@ -327,6 +336,10 @@ screen navigation():
 
             ## Help isn't necessary or relevant to mobile devices.
             textbutton _("Help") action ShowMenu("help")
+
+        if main_menu:
+
+            textbutton _("Extras") action ShowMenu("achievements") alt "Extras"
 
         if renpy.variant("pc"):
 
@@ -357,21 +370,27 @@ screen main_menu():
     ## This ensures that any other menu screen is replaced.
     tag menu
 
-    style_prefix "main_menu"
-
     add gui.main_menu_background
 
     ## This empty frame darkens the main menu.
-    frame:
-        pass
+    ## Don't want that sidebar on the left? Change the image associated
+    ## with it or comment this out.
+    ##frame:
+      ##  style "main_menu_frame"
 
     ## The use statement includes another screen inside this one. The actual
     ## contents of the main menu are in the navigation screen.
+    ## Personally, I usually make a separate set of menu buttons so I can
+    ## control placement better.
     use navigation
 
+    ## Note: I've found that turning this off in options.rpy actually
+    ## doesn't do anything. Comment it out if you don't want this.
     if gui.show_name:
 
         vbox:
+            style "main_menu_vbox"
+
             text "[config.name!t]":
                 style "main_menu_title"
 
@@ -386,17 +405,17 @@ style main_menu_title is main_menu_text
 style main_menu_version is main_menu_text
 
 style main_menu_frame:
-    xsize 280
+    xsize 420
     yfill True
 
     background "gui/overlay/main_menu.png"
 
 style main_menu_vbox:
-    xalign 1.0
-    xoffset -20
-    xmaximum 800
+    xalign 0.1
+    xoffset -30
+    xmaximum 1200
     yalign 1.0
-    yoffset -20
+    yoffset -30
 
 style main_menu_text:
     properties gui.text_properties("main_menu", accent=True)
@@ -498,32 +517,32 @@ style return_button is navigation_button
 style return_button_text is navigation_button_text
 
 style game_menu_outer_frame:
-    bottom_padding 30
-    top_padding 120
+    bottom_padding 45
+    top_padding 180
 
     background "gui/overlay/game_menu.png"
 
 style game_menu_navigation_frame:
-    xsize 280
+    xsize 420
     yfill True
 
 style game_menu_content_frame:
-    left_margin 40
-    right_margin 20
-    top_margin 10
+    left_margin 60
+    right_margin 30
+    top_margin 15
 
 style game_menu_viewport:
-    xsize 920
+    xsize 1380
 
 style game_menu_vscrollbar:
     unscrollable gui.unscrollable
 
 style game_menu_side:
-    spacing 10
+    spacing 15
 
 style game_menu_label:
-    xpos 50
-    ysize 120
+    xpos 75
+    ysize 180
 
 style game_menu_label_text:
     size gui.title_text_size
@@ -533,7 +552,7 @@ style game_menu_label_text:
 style return_button:
     xpos gui.navigation_xpos
     yalign 1.0
-    yoffset -30
+    yoffset -45
 
 
 ## About screen ################################################################
@@ -564,10 +583,6 @@ screen about():
                 text "[gui.about!t]\n"
 
             text _("Made with {a=https://www.renpy.org/}Ren'Py{/a} [renpy.version_only].\n\n[renpy.license!t]")
-
-
-## This is redefined in options.rpy to add text to the about screen.
-define gui.about = ""
 
 
 style about_label is gui_label
@@ -676,6 +691,9 @@ screen file_slots(title):
 
                 textbutton _(">") action FilePageNext()
 
+## Set these to false if you wish to remove the Auto or Quick file pages
+define config.has_autosave = True
+define config.has_quicksave = True
 
 style page_label is gui_label
 style page_label_text is gui_label_text
@@ -688,8 +706,8 @@ style slot_time_text is slot_button_text
 style slot_name_text is slot_button_text
 
 style page_label:
-    xpadding 50
-    ypadding 3
+    xpadding 75
+    ypadding 5
 
 style page_label_text:
     text_align 0.5
@@ -736,18 +754,53 @@ screen preferences():
                         textbutton _("Fullscreen") action Preference("display", "fullscreen")
 
                 vbox:
-                    style_prefix "radio"
-                    label _("Rollback Side")
-                    textbutton _("Disable") action Preference("rollback side", "disable")
-                    textbutton _("Left") action Preference("rollback side", "left")
-                    textbutton _("Right") action Preference("rollback side", "right")
-
-                vbox:
                     style_prefix "check"
                     label _("Skip")
                     textbutton _("Unseen Text") action Preference("skip", "toggle")
                     textbutton _("After Choices") action Preference("after choices", "toggle")
                     textbutton _("Transitions") action InvertSelected(Preference("transitions", "toggle"))
+
+                ## Custom Preferences here
+
+                vbox:
+                    style_prefix "check"
+                    label _("Toggles")
+                    textbutton _("Image Descriptions") action ToggleVariable("persistent.image_captions") alt "Toggle Image Descriptions"
+                    textbutton _("Audio Titles") action ToggleVariable("persistent.sound_captions") alt "Toggle Sound Captions"
+                    if renpy.variant("pc"):
+                        ## Self-voicing does not work on smartphone devices, so this
+                        ## option only shows if the user is playing on a PC.
+                        textbutton _("Self-Voicing") action Preference("self voicing", "toggle") alt "Toggle Self-Voicing"
+                    textbutton "Screenshake" action ToggleField(persistent,"screenshake",true_value=True,false_value=False) alt "Toggle Screen Shake"
+
+                vbox:
+                    style_prefix "radio"
+                    label _("Typeface")
+                    textbutton _("DejaVu Sans") action [gui.SetPreference("font", "DejaVuSans.ttf"), gui.SetPreference("size", 31), SetVariable("persistent.typeface", "DejaVuSans")] alt "Change font to DejaVu Sans"
+                    textbutton _("{font=gui/font/Atkinson-Hyperlegible-Regular-102.ttf}{size=40}Hyperlegible{/size}{/font}") action [gui.SetPreference("font", "gui/font/Atkinson-Hyperlegible-Regular-102.ttf"), gui.SetPreference("size", 32), SetVariable("persistent.typeface", "Hyperlegible")] alt "Change font to HyperLegible"
+
+                vbox:
+                    style_prefix "radio"
+                    label _("Font Size")
+                    if persistent.typeface == "DejaVuSans":
+                        textbutton _("Large") action gui.SetPreference("size", 40) alt "Change to Large Size Text"
+                        textbutton _("Regular") action gui.SetPreference("size", 31) alt "Change to Regular Size Text"
+                    elif persistent.typeface == "Hyperlegible":
+                        textbutton _("Large") action gui.SetPreference("size", 38) alt "Change to Large Size Text"
+                        textbutton _("Regular") action gui.SetPreference("size", 32) alt "Change to Regular Size Text"
+
+                vbox:
+                    style_prefix "radio"
+                    label _("Text Color")
+                    textbutton _("White") action gui.SetPreference("color", "#ffffff") alt "Change text color to white" 
+                    textbutton _("Cream") action gui.SetPreference("color", "#FFFDD0") alt "Change text color to cream" 
+
+                vbox:
+                    style_prefix "radio"
+                    label _("Line Spacing")
+                    textbutton _("Taller") action gui.SetPreference("dialogue_spacing", 4) alt "Change the height of the space between lines of dialogue to be taller"
+                    textbutton _("Regular") action gui.SetPreference("dialogue_spacing", 2) alt "Change the height of the space between lines of dialogue to the regular height"
+
 
                 ## Additional vboxes of type "radio_pref" or "check_pref" can be
                 ## added here, to add additional creator-defined preferences.
@@ -767,6 +820,11 @@ screen preferences():
                     label _("Auto-Forward Time")
 
                     bar value Preference("auto-forward time")
+
+                    label _("Textbox Opacity")
+
+                    bar value FieldValue(persistent, 'say_window_alpha', 1.0, max_is_zero=False, offset=0, step=.2) xmaximum 525 style "slider" alt "Textbox Opacity"
+
 
                 vbox:
 
@@ -832,13 +890,13 @@ style mute_all_button_text is check_button_text
 
 style pref_label:
     top_margin gui.pref_spacing
-    bottom_margin 2
+    bottom_margin 3
 
 style pref_label_text:
     yalign 1.0
 
 style pref_vbox:
-    xsize 225
+    xsize 338
 
 style radio_vbox:
     spacing gui.pref_button_spacing
@@ -861,18 +919,18 @@ style check_button_text:
     properties gui.button_text_properties("check_button")
 
 style slider_slider:
-    xsize 350
+    xsize 525
 
 style slider_button:
     properties gui.button_properties("slider_button")
     yalign 0.5
-    left_margin 10
+    left_margin 15
 
 style slider_button_text:
     properties gui.button_text_properties("slider_button")
 
 style slider_vbox:
-    xsize 450
+    xsize 675
 
 
 ## History screen ##############################################################
@@ -883,47 +941,147 @@ style slider_vbox:
 ##
 ## https://www.renpy.org/doc/html/history.html
 
+## Note: This is my custom version of the History screen that is not attached
+## to the game menu, and will appear in place of the textbox when called up.
+## Margins and Padding may need to be adjusted accordingly.
+
+## TODO: If you are not basing your project off this template, please do the following:
+## At "style vscrollbar", add the line below:
+## unscrollable "hide"
+## Copy over the styles for this history screen
+## In "gui.rpy", change "gui.history_height" to "None"
+## Use CTRL + F to find the terms as you need to.
+
 screen history():
 
     tag menu
 
-    ## Avoid predicting this screen, as it can be very large.
     predict False
 
-    use game_menu(_("History"), scroll=("vpgrid" if gui.history_height else "viewport"), yinitial=1.0):
+    frame:
 
         style_prefix "history"
 
-        for h in _history_list:
+        ## If you have a custom image you want to use for the screen, you can set it as
+        ## a Frame below.
+        # background Frame(["gui/frame.png"], gui.history_frame_borders, tile=True)
 
-            window:
+        ## Style this as needed in the style definitions
+        label _("History")
 
-                ## This lays things out properly if history_height is None.
-                has fixed:
-                    yfit True
+        ## Using margin properties will allow the screen to automatically adjust should
+        ## you choose to use a different resolution than 1080p, and will always be centered. 
+        ## You can also resize the screen using "xmaximum", "ymaximum", or "maximum(x,y)"
+        ## if desired, but you will need to use "align(x,y)" to manually position it.
 
-                if h.who:
+        ## xmargin essentially combines the left_margin and right_margin properties
+        ## and sets them to the same value
+        xmargin 200
 
-                    label h.who:
-                        style "history_name"
-                        substitute False
+        ## ymargin essentially combines the top_margin and bottom_margin properties
+        ## and sets them to the same value
+        ymargin 50
 
-                        ## Take the color of the who text from the Character, if
-                        ## set.
-                        if "color" in h.who_args:
-                            text_color h.who_args["color"]
+        ## xpadding essentially combines the left_padding and right_padding properties
+        ## and sets them to the same value
+        xpadding 50
 
-                $ what = renpy.filter_text_tags(h.what, allow=gui.history_allow_tags)
-                text what:
-                    substitute False
+        ## ypadding essentially combines the top_padding and bottom_padding properties
+        ## and sets them to the same value
+        ypadding 150
 
-        if not _history_list:
-            label _("The dialogue history is empty.")
+        vpgrid:
+
+            cols 1
+            yinitial 1.0
+
+            draggable True
+            mousewheel True
+            scrollbars "vertical"
+
+            vbox:
+
+                for h in _history_list:
+
+                    window:
+
+                        ## This lays things out properly if history_height is None.
+                        has fixed:
+                            yfit True
+
+                        if h.who:
+
+                            label h.who:
+                                style "history_name"
+                                substitute False
+
+                                ## Take the color of the who text from the Character, if
+                                ## set.
+                                if "color" in h.who_args:
+                                    text_color h.who_args["color"]
+
+                        $ what = renpy.filter_text_tags(h.what, allow=gui.history_allow_tags)
+                        text what:
+                            line_spacing 5
+                            substitute False
+
+                    ## This puts some space between entries so it's easier to read
+                    null height 20
+
+                if not _history_list:
+
+                    text "The text log is empty." line_spacing 10
+                    ## Adding line_spacing prevents the bottom of the text
+                    ## from getting cut off. Adjust when replacing the
+                    ## default fonts.
+
+        textbutton "Return":
+            style "history_return_button"
+            action Return()
+            alt _("Return") 
+
+### The old version of the History screen, just for reference.
+# screen history():
+
+#     tag menu
+
+#     ## Avoid predicting this screen, as it can be very large.
+#     predict False
+
+#     use game_menu(_("History"), scroll=("vpgrid" if gui.history_height else "viewport"), yinitial=1.0):
+
+#         style_prefix "history"
+
+#         for h in _history_list:
+
+#             window:
+
+#                 ## This lays things out properly if history_height is None.
+#                 has fixed:
+#                     yfit True
+
+#                 if h.who:
+
+#                     label h.who:
+#                         style "history_name"
+#                         substitute False
+
+#                         ## Take the color of the who text from the Character, if
+#                         ## set.
+#                         if "color" in h.who_args:
+#                             text_color h.who_args["color"]
+
+#                 $ what = renpy.filter_text_tags(h.what, allow=gui.history_allow_tags)
+#                 text what:
+#                     substitute False
+
+#         if not _history_list:
+#             label _("The dialogue history is empty.")
 
 
 ## This determines what tags are allowed to be displayed on the history screen.
 
-define gui.history_allow_tags = set()
+define gui.history_allow_tags = { "alt", "noalt" }
 
 
 style history_window is empty
@@ -962,9 +1120,16 @@ style history_text:
 
 style history_label:
     xfill True
+    top_margin -100
 
 style history_label_text:
     xalign 0.5
+    ## Note: When altering the size of the label, you may need to increase the
+    ## ypadding of the Frame, or separate it again into top_padding and bottom_padding
+
+style history_return_button:
+    align(1.0,1.0)
+    yoffset 100
 
 
 ## Help screen #################################################################
@@ -984,7 +1149,7 @@ screen help():
         style_prefix "help"
 
         vbox:
-            spacing 15
+            spacing 23
 
             hbox:
 
@@ -1048,6 +1213,10 @@ screen keyboard_help():
         label "V"
         text _("Toggles assistive {a=https://www.renpy.org/l/voicing}self-voicing{/a}.")
 
+    hbox:
+        label "Shift+A"
+        text _("Opens the accessibility menu.")
+
 
 screen mouse_help():
 
@@ -1110,14 +1279,14 @@ style help_text is gui_text
 
 style help_button:
     properties gui.button_properties("help_button")
-    xmargin 8
+    xmargin 12
 
 style help_button_text:
     properties gui.button_text_properties("help_button")
 
 style help_label:
-    xsize 250
-    right_padding 20
+    xsize 375
+    right_padding 30
 
 style help_label_text:
     size gui.text_size
@@ -1154,7 +1323,7 @@ screen confirm(message, yes_action, no_action):
         vbox:
             xalign .5
             yalign .5
-            spacing 30
+            spacing 45
 
             label _(message):
                 style "confirm_prompt"
@@ -1162,7 +1331,7 @@ screen confirm(message, yes_action, no_action):
 
             hbox:
                 xalign 0.5
-                spacing 100
+                spacing 150
 
                 textbutton _("Yes") action yes_action
                 textbutton _("No") action no_action
@@ -1209,7 +1378,7 @@ screen skip_indicator():
     frame:
 
         hbox:
-            spacing 6
+            spacing 9
 
             text _("Skipping")
 
@@ -1318,7 +1487,7 @@ screen nvl(dialogue, items=None):
             use nvl_dialogue(dialogue)
 
         ## Displays the menu, if given. The menu may be displayed incorrectly if
-        ## config.narrator_menu is set to True, as it is above.
+        ## config.narrator_menu is set to True.
         for i in items:
 
             textbutton i.caption:
@@ -1326,6 +1495,8 @@ screen nvl(dialogue, items=None):
                 style "nvl_button"
 
     add SideImage() xalign 0.0 yalign 1.0
+
+    use quick_menu
 
 
 screen nvl_dialogue(dialogue):
@@ -1414,7 +1585,7 @@ style nvl_button_text:
 
 style pref_vbox:
     variant "medium"
-    xsize 450
+    xsize 675
 
 ## Since a mouse may not be present, we replace the quick menu with a version
 ## that uses fewer and bigger buttons that are easier to touch.
@@ -1463,7 +1634,7 @@ style game_menu_outer_frame:
 
 style game_menu_navigation_frame:
     variant "small"
-    xsize 340
+    xsize 510
 
 style game_menu_content_frame:
     variant "small"
@@ -1471,7 +1642,7 @@ style game_menu_content_frame:
 
 style pref_vbox:
     variant "small"
-    xsize 400
+    xsize 600
 
 style bar:
     variant "small"
@@ -1509,10 +1680,10 @@ style vslider:
     base_bar Frame("gui/phone/slider/vertical_[prefix_]bar.png", gui.vslider_borders, tile=gui.slider_tile)
     thumb "gui/phone/slider/vertical_[prefix_]thumb.png"
 
-style slider_pref_vbox:
+style slider_vbox:
     variant "small"
     xsize None
 
-style slider_pref_slider:
+style slider_slider:
     variant "small"
-    xsize 600
+    xsize 900
