@@ -8,6 +8,7 @@ define i = Character('Shop Owner', color="#FFFFFF")
 
 
 #PENDING EDIT THIS LATER
+#PENDING birthday event later
 
 # The game starts here.
 
@@ -68,7 +69,7 @@ label start:
 
   show standannoyed
 
-  b "*groans* Alright just... *yawn* let's get some coffee..."
+  b *groans* Alright just... *yawn* let's get some coffee or somethin...
 
   jump morningDateChoice
 
@@ -84,6 +85,126 @@ label start:
  m "Helloooo, Basaraaaa?"
  b "....."
  m "Basara!"
+
+ menu:
+ 
+  "(Wait.)":
+  jump waiting
+  
+  "...Let's play a trick":
+  jump tricktime
+  
+  
+ label tricktime:
+ 
+ #PENDING scene change to downstairs fridge
+ 
+ m "I have just the right idea."
+ 
+ menu:
+ 
+	"Grab an icecube":
+	$ ice = True
+	jump trix
+	
+	"Grab a water bottle":
+	$ ice = False
+	jump trix
+	
+
+ label trix:
+ 
+ m "Heh, perfect."
+ 
+ #PENDING scene change basara tank top back
+ 
+ m "(And now...)"
+ 
+ if ice:
+  m "(I drop the ice cube in his shirt.)
+  #PENDING shake screen for next dialogue
+  b "GYAH. THE HELL--??"
+  m "Hi Basara!"
+  
+  scene bedmorning 
+  with dissolve
+  
+  show guitarannoyed
+  with dissolve
+    
+  #PENDING maybe add screen shake for these screams
+  b "Crap! What the heck did you do, jeez that's cold!"
+  b "Man, ice?! What were you thinking?!"
+  m "I called you a few times and you didnt answer."
+  m "Decided to play a prank."
+  b "*huffs* Yeah, I noticed! What the heck do you want anyway?"
+  m "We had a date remember?"
+  
+  show guitarconfused
+  
+  b "Huh........ "
+  m "A few days ago I said I'd be here to pick you up, remember?"
+  m "I wanted to hang out with you."
+  
+  show guitarsideeye
+  
+  b " Uhh...."
+  
+  show guitarnormal
+  
+  b "Oh.... "
+  b "Well, fine. Give me a minute."
+  
+  jump morningDateChoice
+  
+ else:
+  m "(maybe this is a bit much....)"
+  m "(it's too late to turn back now.)"
+  m "(I dump the water over his head.)"
+  
+  scene bedmorningguitar
+  with dissolve
+  
+  show standannoyed
+  with dissolve
+  
+  b "..."
+  m "..."
+  b "..."
+  m "..."
+  b "....Hey."
+  m "I'm sorry."
+  b "............."
+  m "You weren't answering me so..."
+  b "-SIGH-"
+  b "At least you didnt get the sheet music wet..."
+  
+  show standsideeye
+  
+  b "Why are you here anyway?"
+  b "... Oh, weren't we going to hang out?"
+  m "I really dont know what came over me."
+  
+  show standnormal
+  
+  b "It's fine, let's go then."
+  m "Not gonna change?"
+  
+  show standsmirk
+  
+  b "Nah, it's just a little water. C'mon, are you coming or not?"
+  
+  scene bedmorningguitar
+  with dissolve
+  
+  m "Yeah... yeah, let's go!"
+  
+  jump morningDateChoice
+  
+  
+  
+ label waiting:
+
  b "I hear you. Give me a minute."
  m "(oops, i think i made him mad.)"
 
@@ -92,12 +213,18 @@ label start:
 
  show guitarannoyed
  with dissolve
+ 
+ b "Why are you here anyway?"
 
  m "We were going to hang out, remember?"
 
  show guitarsideeye
 
- b "aahhhnn.... Did we? I dont remember... Whatever, I'm stuck anyway. Let's go out."
+ b "aahhhnn.... Did we? I dont remember..."
+ 
+ m "..."
+ 
+ b "Whatever, I'm stuck anyway. Let's go out."
 
  jump morningDateChoice
 
@@ -117,10 +244,27 @@ label start:
 
  label cafeMorning:
 
+  #PENDING outside cafe scene
+  
+  p "Okay, we're here."
+  b "This place?"
+  p "Yeah, it just opened."
+  p "I've got a coupon, so let's give it a shot."
+  b "..."
+  
+  scene cafe
+  with dissolve
+  
+  p "Table for two please."
+  c "Right this way please."
+
   scene cafewindow
   with dissolve
  
   play music "audio/bitchesblue.mp3"
+  
+  p "I wonder what the menu is..."
+  b "Dunno."
 
   c "What can I get for you?"
   menu: 
@@ -168,7 +312,11 @@ label start:
    with dissolve
    
    m "Woah! Huge!"
-   b "....What? ... You want some?"
+   b "...."
+   b "....What?"
+   b "... You want some?"
+   m "No thanks, you enjoy it."
+   
   else:
    m "nice(CHANGE EDIT)"
    show orangefull
@@ -176,7 +324,7 @@ label start:
 
   b "..."
   m "(He's poking at it...)"
-  m "Mine is so good! How's yours?"
+  m "Mine is pretty good! How is yours?"
   b "..."
   b "..."
   b ".... Not bad."
@@ -190,7 +338,10 @@ label start:
     jump faiyaa
    "This is totally BOMBER!":
     jump bombaa
-
+  
+  
+ label faiyaa:
+ 
   scene cafesitannoyed
   with dissolve
   
@@ -199,24 +350,31 @@ label start:
   else:
    show orangefull
   
-  
- label faiyaa:
- 
   b "Gimme a break."
   jump cafeMorningNext
 
  label bombaa:
  
+  scene cafesitannoyed
+  with dissolve
+  
+  if bigParfait:
+   show frappefull
+  else:
+   show orangefull
+ 
   b "You think you're being funny, huh?"
   jump cafeMorningNext
   
  label cafeMorningNext:
+ 
+ 
+ #PENDING add a version where hes not smiling. just sitting there
+ scene cafesitsmile
 
  if bigParfait:
-  hide frappefull
   show frappehalf
  else:
-  hide orangefull
   show orangehalf
  
   b "Lemme pick out the next place after this."
@@ -268,6 +426,54 @@ label start:
   with dissolve
   
   m "So where did you want to go?"
+  b "Huh?"
+  m "Huh?"
+  b ".........."
+  m "What is it??"
+  
+  show standsmirk
+  
+  b "Kicked something... Oh, it's a rock. Heh."
+  "He kicks the rock"
+  b ".... It's really going."
+  m "Let me try..."
+  pause 2.0
+  m "Haha, how's that!"
+  b "Wow."
+  
+  scene outsidemorning with dissolve
+  m "(We kicked the rock for a while.)
+  
+  show standsideeye
+  b "I saw it while Ray was driving the other day and wanted to check it out. "
+  
+  "Kick."
+  
+  p "What?"
+  
+  "Kick."
+  
+  b "You asked--"
+  
+  "Kick."
+  
+  p "Yeah, I remember now, sorry."
+  
+  "Kick."
+  
+  
+  #PENDING fade to black and then back again
+  
+  b "This is it."
+  b "Here, hold onto this."
+  m "(He hands me something.)"
+  #PENDING fade out basara sprite
+  m "Huh?"
+  m "Oh, this is the rock we were kicking."
+  m "Hey, Basara... Huh?"
+  m "He went ahead."
+  m "Good grief..."
+  
   b "Over here. I saw it while Ray was driving the other day and wanted to check it out. Come on."
 
   hide standnormal
@@ -291,6 +497,8 @@ label start:
  
   show standsideeye
   with dissolve
+  
+  pause 1.0
   
   hide standsideeye
   with dissolve
@@ -408,6 +616,8 @@ label start:
   hide standsmile
 
   m "..... Aahh..."
+  
+  #PENDING add route ending title
 
  label lunchMorning:
   
