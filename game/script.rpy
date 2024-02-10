@@ -36,9 +36,12 @@ label start:
 
  #morning start script
  
- #PENDING nature sounds play here
- #PENDING akusho background
- #PENDING display door to basara's room
+ play sound audio/birds.mp3
+ scene akusho with dissolve
+ 
+ "It's a pretty nice day out today."
+ 
+ scene door with dissolve
 
   menu:
    "Basara, are you here?":
@@ -97,7 +100,7 @@ label start:
   
  label tricktime:
  
- #PENDING scene change to downstairs fridge
+ scene downstairs with dissolve
  
  m "I have just the right idea."
  
@@ -116,14 +119,13 @@ label start:
  
  m "Heh, perfect."
  
- #PENDING scene change basara tank top back
+ scene basaraback with dissolve
  
  m "(And now...)"
  
  if ice:
   m "(I drop the ice cube in his shirt.)
-  #PENDING shake screen for next dialogue
-  b "GYAH. THE HELL--??"
+  b "GYAH. THE HELL--??" with hpunch
   m "Hi Basara!"
   
   scene bedmorning 
@@ -132,9 +134,8 @@ label start:
   show guitarannoyed
   with dissolve
     
-  #PENDING maybe add screen shake for these screams
-  b "Crap! What the heck did you do, jeez that's cold!"
-  b "Man, ice?! What were you thinking?!"
+  b "Crap! What the heck did you do, jeez that's cold!" with hpunch
+  b "Man, ice?! What were you thinking?!" with hpunch
   m "I called you a few times and you didnt answer."
   m "Decided to play a prank."
   b "*huffs* Yeah, I noticed! What the heck do you want anyway?"
@@ -368,9 +369,7 @@ label start:
   
  label cafeMorningNext:
  
- 
- #PENDING add a version where hes not smiling. just sitting there
- scene cafesitsmile
+ scene cafesitnormal
 
  if bigParfait:
   show frappehalf
@@ -444,7 +443,7 @@ label start:
   scene outsidemorning with dissolve
   m "(We kicked the rock for a while.)
   
-  show standsideeye
+  show standsideeye with dissolve
   b "I saw it while Ray was driving the other day and wanted to check it out. "
   
   "Kick."
@@ -462,12 +461,16 @@ label start:
   "Kick."
   
   
-  #PENDING fade to black and then back again
+  scene blackscreen with dissolve
+  scene outsidemorning with dissolve
+  show standnormal with dissolve
   
   b "This is it."
   b "Here, hold onto this."
   m "(He hands me something.)"
-  #PENDING fade out basara sprite
+  
+  scene outsidemorning with dissolve
+  
   m "Huh?"
   m "Oh, this is the rock we were kicking."
   m "Hey, Basara... Huh?"
@@ -616,8 +619,10 @@ label start:
   hide standsmile
 
   m "..... Aahh..."
+  #PENDING make good ed image
+  scene endingpending with dissolve
   
-  #PENDING add route ending title
+  "ENDING #1"
 
  label lunchMorning:
   
